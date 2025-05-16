@@ -75,6 +75,7 @@ namespace ToDoSecureMVC.Controllers
             var response = await client.PostAsync("/api/ToDo", content);
             if (response.IsSuccessStatusCode)
             {
+                TempData["SuccessMessage"] = "Task added successfully";
                 return RedirectToAction(nameof(Index));
             }
             ModelState.AddModelError("", "Unable to create Task");
@@ -95,7 +96,7 @@ namespace ToDoSecureMVC.Controllers
             var response = await client.GetAsync($"/api/ToDo/{id}");
 
             if (!response.IsSuccessStatusCode)
-            {
+            {                
                 return RedirectToAction(nameof(Index));
             }
 
@@ -131,12 +132,30 @@ namespace ToDoSecureMVC.Controllers
 
             if (response.IsSuccessStatusCode)
             {
+                TempData["SuccessMessage"] = "Task Updated successfully";
                 return RedirectToAction(nameof(Index));
             }
 
             ModelState.AddModelError("", "Unable to update task");
             return View(model);
-
         }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+           
+            TempData.Keep("SuccessMessage");
+            return View();
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            TempData["SuccessMessage"] = "You have been logged out successfully!";
+            return RedirectToAction("Login", "Account");
+        }
+
+
+
     }
 }

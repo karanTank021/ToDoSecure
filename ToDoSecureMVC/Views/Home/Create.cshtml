@@ -4,6 +4,13 @@
     ViewData["Title"] = "Create Task";
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="tempdata-success-alert" class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index:1050; min-width: 250px;">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <h2 class="text-center mt-4">Create New Task</h2>
 <div class="row justify-content-center">
     <div class="col-md-6">
