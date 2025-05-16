@@ -1,0 +1,107 @@
+﻿@model List<ToDoSecureMVC.Models.ToDoModel>
+
+@{
+    ViewData["Title"] = "ToDo List";
+    var isAdmin = ViewBag.IsAdmin as bool? ?? false;
+    var jwtToken = Context.Session.GetString("JWToken");
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<div class="container mt-4">
+    <h2 class="mb-4">My ToDo List</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>       
+
+    }
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Completed</th>
+                @if (isAdmin)
+                {
+                    <th>Actions</th>
+                }
+            </tr>
+        </thead>
+        <tbody id="todo-body">
+            @foreach (var task in Model)
+            {
+                <tr id="row-@task.Id">
+                    <td>@task.Task</td>
+                    <td>
+                        @if (task.IsCompleted)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">No</span>
+                        }
+                    </td>
+                    @if (isAdmin)
+                    {
+                        <td>
+                            <a href="@Url.Action("Edit", "Home", new { id = task.Id })" class="btn btn-sm btn-info">Edit</a>
+                            <button class="btn btn-sm btn-danger ms-2" onclick="completeTask(@task.Id)">Complete</button>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (isAdmin)
+    {
+        <a href="@Url.Action("Create", "Home")" class="btn btn-primary">Add New Task</a>    
+    }
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        const apiToken = '@jwtToken';
+
+        function completeTask(id) {
+            if (confirm("Are you sure you want to mark this task as complete?")) {
+                $.ajax({
+                    url: "https://localhost:7100/api/ToDo/" + id,
+                    type: "DELETE",
+                    headers: {
+                        "Authorization": "Bearer " + apiToken
+                    },
+                    success: function (result) {
+                        // Remove the task row from the table
+                        $("#row-" + id).fadeOut("slow", function () {
+                            $(this).remove();
+                        });
+
+                        // Remove any existing success alerts to avoid duplicates
+                        $(".alert-success").remove();
+
+                        // Prepend the new success alert and fade it out after 2 seconds
+                      $("<div class='alert alert-success position-fixed start-50 translate-middle-x mt-3' style='z-index:1050; min-width: 250px;'>Task removed successfully</div>")
+
+
+                            .prependTo(".container")
+                            .delay(2000)
+                            .fadeOut(function () {
+                                $(this).remove();
+                            });                       
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error while deleting task.\nStatus: " + status + "\n" + xhr.responseText);
+                    }
+                });
+            }
+        }
+    </script>
+}

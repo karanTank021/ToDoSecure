@@ -1,0 +1,45 @@
+﻿@model ToDoSecureMVC.Models.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5">
+    <h2>Login</h2>
+    
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            Invalid username or password.
+        </div>
+    }
+
+    <form asp-action="Login" method="post">
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" class="form-control" type="password" />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+
+    <div class="mt-3">
+        <p>Don't have an account? <a asp-controller="Authentication" asp-action="Register">Register here</a></p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            var alert = document.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                alert.classList.add('hide');
+                alert.style.display = "none";
+            }
+        }, 3000);
+    </script>
+}
